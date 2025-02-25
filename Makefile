@@ -1,9 +1,9 @@
 include Makefile.git
 
-export CLASSPATH=/usr/local/lib/antlr-*-complete.jar
+export CLASSPATH=/usr/share/java/antlr-*-complete.jar
 
 DOMAINNAME = oj.compilers.cpl.icu
-ANTLR = java -jar /usr/local/lib/antlr-*-complete.jar -listener -visitor -long-messages
+ANTLR = java -jar /usr/share/java/antlr-*-complete.jar -listener -visitor -long-messages
 JAVAC = javac -g
 JAVA = java
 
@@ -11,7 +11,7 @@ JAVA = java
 PFILE = $(shell find . -name "SysYParser.g4")
 LFILE = $(shell find . -name "SysYLexer.g4")
 JAVAFILE = $(shell find . -name "*.java")
-ANTLRPATH = $(shell find /usr/local/lib -name "antlr-*-complete.jar")
+ANTLRPATH = $(shell find /usr/share/java -name "antlr-*-complete.jar")
 
 compile: antlr
 	$(call git_commit,"make")
