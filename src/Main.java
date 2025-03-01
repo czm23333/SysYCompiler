@@ -5,9 +5,9 @@ import java.io.IOException;
 public class Main {
     private static void printToken(Vocabulary vocabulary, Token token) {
         if (token.getType() == SysYLexer.INTEGER_CONST)
-            System.out.printf("%s %d at Line %d\n", vocabulary.getSymbolicName(token.getType()),
+            System.err.printf("%s %d at Line %d.\n", vocabulary.getSymbolicName(token.getType()),
                     Integer.decode(token.getText()), token.getLine());
-        else System.out.printf("%s %s at Line %d\n", vocabulary.getSymbolicName(token.getType()), token.getText(),
+        else System.err.printf("%s %s at Line %d.\n", vocabulary.getSymbolicName(token.getType()), token.getText(),
                 token.getLine());
     }
 
@@ -24,7 +24,7 @@ public class Main {
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
                     int charPositionInLine, String msg, RecognitionException e) {
                 hasError[0] = true;
-                System.err.printf("Error type A at Line %d: %s at char %d\n", line, msg, charPositionInLine);
+                System.err.printf("Error type A at Line %d: %s at char %d.\n", line, msg, charPositionInLine);
             }
         });
         var tokens = lexer.getAllTokens();
