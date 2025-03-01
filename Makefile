@@ -1,7 +1,5 @@
 include Makefile.git
 
-export CLASSPATH=/usr/share/java/antlr-*-complete.jar
-
 DOMAINNAME = oj.compilers.cpl.icu
 ANTLR = java -jar /usr/share/java/antlr-*-complete.jar -listener -visitor -long-messages
 JAVAC = javac -g
@@ -16,13 +14,13 @@ ANTLRPATH = $(shell find /usr/share/java -name "antlr-*-complete.jar")
 compile: antlr
 	$(call git_commit,"make")
 	mkdir -p classes
-	$(JAVAC) $(JAVAFILE) -d classes
+	$(JAVAC) -cp $(ANTLRPATH) $(JAVAFILE) -d classes
 
 run: compile
 	java -classpath ./classes:$(ANTLRPATH) Main $(FILEPATH)
 
 
-antlr: $(LFILE) $(PFILE) 
+antlr: $(LFILE) $(PFILE)
 	$(ANTLR) $(PFILE) $(LFILE)
 
 
@@ -46,5 +44,3 @@ submit: clean
 
 
 .PHONY: compile antlr test run clean submit
-
-
