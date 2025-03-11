@@ -36,9 +36,8 @@ expr : value=INTEGER_CONST # const
      | l=expr AND r=expr # and
      | l=expr OR r=expr # or;
 
-stmtBlock : L_BRACE stmt* R_BRACE;
+stmtBlock : L_BRACE (varDef | stmt)* R_BRACE;
 stmt : expr? SEMICOLON # expression
-     | varDef # vdef
      | lvalue=leftVal ASSIGN value=expr SEMICOLON # assignment
      | stmtBlock # block
      | IF L_PAREN cond=expr R_PAREN stmtTrue=stmt (ELSE stmtFalse=stmt)? # if

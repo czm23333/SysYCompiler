@@ -40,8 +40,9 @@ public class SysYFormatVisitor extends SysYParserBaseVisitor<String> {
 
     @Override
     public String visitStmtBlock(SysYParser.StmtBlockContext stmtBlock) {
-        return String.format("{\n%s}\n",
-                addIndent(stmtBlock.stmt().stream().map(this::visit).collect(Collectors.joining())));
+        return String.format("{\n%s}\n", addIndent(stmtBlock.children.stream()
+                .filter(x -> x instanceof SysYParser.StmtContext || x instanceof SysYParser.VarDefContext)
+                .map(this::visit).collect(Collectors.joining())));
     }
 
     @Override
