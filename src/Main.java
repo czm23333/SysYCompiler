@@ -31,7 +31,7 @@ public class Main {
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
                     int charPositionInLine, String msg, RecognitionException e) {
-                System.err.printf("Error type B at Line %d: %s at char %d.\n", line, msg, charPositionInLine);
+                System.out.printf("Error type B at Line %d: %s at char %d.\n", line, msg, charPositionInLine);
                 flag[0] = true;
             }
         });
