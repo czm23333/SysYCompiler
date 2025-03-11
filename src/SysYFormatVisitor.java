@@ -118,9 +118,9 @@ public class SysYFormatVisitor extends SysYParserBaseVisitor<String> {
 
     @Override
     protected String aggregateResult(String aggregate, String nextResult) {
-        if (aggregate.isEmpty()) return nextResult;
         if (nextResult.isEmpty()) return aggregate;
         if (";".equals(nextResult)) return aggregate + nextResult + '\n';
+        if (aggregate.isEmpty()) return nextResult;
         if (Character.isWhitespace(aggregate.charAt(aggregate.length() - 1)) ||
             Character.isWhitespace(nextResult.charAt(0)) || aggregate.endsWith("(") || aggregate.endsWith("[") ||
             aggregate.endsWith("{") || ",".equals(nextResult) || ")".equals(nextResult) || "]".equals(nextResult) ||
