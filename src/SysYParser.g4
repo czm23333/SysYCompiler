@@ -30,18 +30,20 @@ expr : value=INTEGER_CONST # const
      | L_PAREN expr R_PAREN # paren
      | op=(PLUS | MINUS | NOT) x=expr # unary
      | l=expr op=(MUL | DIV | MOD) r=expr # muls
-     | l=expr op=(PLUS | MINUS) r=expr # adds
+     | l=expr op=(PLUS | MINUS) r=expr # adds;
+
+conds : expr # exprCond
      | l=expr op=(LT | GT | LE | GE) r=expr # rels
      | l=expr op=(EQ | NEQ) r=expr #eqs
-     | l=expr AND r=expr # and
-     | l=expr OR r=expr # or;
+     | l=conds AND r=conds # and
+     | l=conds OR r=conds # or;
 
 stmtBlock : L_BRACE (varDef | stmt)* R_BRACE;
 stmt : expr? SEMICOLON # expression
      | lvalue=leftVal ASSIGN value=expr SEMICOLON # assignment
      | stmtBlock # block
-     | IF L_PAREN cond=expr R_PAREN stmtTrue=stmt (ELSE stmtFalse=stmt)? # if
-     | WHILE L_PAREN cond=expr R_PAREN stmtTrue=stmt # while
+     | IF L_PAREN cond=conds R_PAREN stmtTrue=stmt (ELSE stmtFalse=stmt)? # if
+     | WHILE L_PAREN cond=conds R_PAREN stmtTrue=stmt # while
      | BREAK SEMICOLON # break
      | CONTINUE SEMICOLON # continue
      | RETURN ret=expr? SEMICOLON # return;
