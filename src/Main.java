@@ -10,7 +10,7 @@ public class Main {
         var formatter = new SysYFormatVisitor();
         var program = parser.program();
         if (flag[0]) return;
-        System.out.print(formatter.visit(program));
+        System.out.print(formatter.visit(program).trim());
     }
 
     private static SysYParser getSysYParser(CharStream stream, boolean[] flag) {

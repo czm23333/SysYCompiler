@@ -73,6 +73,11 @@ public class SysYFormatVisitor extends SysYParserBaseVisitor<String> {
     }
 
     @Override
+    public String visitLeftVal(SysYParser.LeftValContext leftVal) {
+        return String.format("%s%s", leftVal.IDENT().getText(), visit(leftVal.arrayPostfix()));
+    }
+
+    @Override
     public String visitIf(SysYParser.IfContext node) {
         var result = defaultResult();
         int n = node.getChildCount();
