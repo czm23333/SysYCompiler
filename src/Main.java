@@ -5,12 +5,15 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) throws IOException {
         if (args.length == 0) System.exit(1);
-        var parser = getSysYParser(CharStreams.fromFileName(args[0]));
+        var flag = new boolean[1];
+        var parser = getSysYParser(CharStreams.fromFileName(args[0]), flag);
         var formatter = new SysYFormatVisitor();
-        System.out.print(formatter.visit(parser.program()));
+        var program = parser.program();
+        if (flag[0]) return;
+        System.out.print(formatter.visit(program));
     }
 
-    private static SysYParser getSysYParser(CharStream stream) {
+    private static SysYParser getSysYParser(CharStream stream, boolean[] flag) {
         var lexer = new SysYLexer(stream);
         lexer.removeErrorListeners();
         lexer.addErrorListener(new BaseErrorListener() {
@@ -18,7 +21,7 @@ public class Main {
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
                     int charPositionInLine, String msg, RecognitionException e) {
                 System.err.printf("Error type A at Line %d: %s at char %d.\n", line, msg, charPositionInLine);
-                System.exit(0);
+                flag[0] = true;
             }
         });
 
@@ -29,7 +32,7 @@ public class Main {
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
                     int charPositionInLine, String msg, RecognitionException e) {
                 System.err.printf("Error type B at Line %d: %s at char %d.\n", line, msg, charPositionInLine);
-                System.exit(0);
+                flag[0] = true;
             }
         });
         return parser;

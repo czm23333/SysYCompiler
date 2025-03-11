@@ -35,6 +35,7 @@
                 <version>4.13.2</version>
                 <configuration>
                     <sourceDirectory>${src.dir}</sourceDirectory>
+                    <visitor>true</visitor>
                 </configuration>
                 <executions>
                     <execution>
