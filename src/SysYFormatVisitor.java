@@ -85,7 +85,7 @@ public class SysYFormatVisitor extends SysYParserBaseVisitor<String> {
             var child = node.getChild(i);
             var childResult = visit(child);
             if (child instanceof SysYParser.StmtContext &&
-                !(child instanceof SysYParser.IfContext || child instanceof SysYParser.BlockContext))
+                !(child instanceof SysYParser.BlockContext || (i == 6 && child instanceof SysYParser.IfContext)))
                 childResult = '\n' + addIndent(childResult);
             result = aggregateResult(result, childResult);
         }
@@ -105,6 +105,7 @@ public class SysYFormatVisitor extends SysYParserBaseVisitor<String> {
         }
         return result;
     }
+
     @Override
     public String visitTerminal(TerminalNode node) {
         return node.getText();
