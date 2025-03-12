@@ -19,7 +19,7 @@ initializer : ASSIGN value=eqInitializeVal # eqInitializer;
 varDefEntry : name=IDENT arrayPostfix init=initializer?;
 varDef : constPrefix type=basicType varDefEntry (COMMA varDefEntry)* SEMICOLON;
 
-funcParam : type=basicType name=IDENT incompleteArray? arrayPostfix;
+funcParam : type=basicType name=IDENT (incompleteArray arrayPostfix)?;
 funcDef : r_type=retType name=IDENT L_PAREN (funcParam (COMMA funcParam)*)? R_PAREN stmtBlock;
 
 leftVal : IDENT arrayPostfix;
