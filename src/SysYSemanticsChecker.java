@@ -241,7 +241,7 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
             flag = true;
         }
         if (flag) return LEFT_ERROR;
-        return RIGHT_INT;
+        return RIGHT_BOOL;
     }
 
     @Override
@@ -275,7 +275,7 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
             flag = true;
         }
         if (flag) return LEFT_ERROR;
-        return RIGHT_INT;
+        return RIGHT_BOOL;
     }
 
     @Override
