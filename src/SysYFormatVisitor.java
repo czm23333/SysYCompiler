@@ -74,7 +74,7 @@ public class SysYFormatVisitor extends SysYParserBaseVisitor<String> {
     }
 
     @Override
-    public String visitLeftVal(SysYParser.LeftValContext leftVal) {
+    public String visitVarAccess(SysYParser.VarAccessContext leftVal) {
         return String.format("%s%s", leftVal.IDENT().getText(), visit(leftVal.arrayPostfix()));
     }
 

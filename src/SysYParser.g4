@@ -4,7 +4,7 @@ options {
     tokenVocab = SysYLexer;
 }
 
-program : (varDef | funcDef)*;
+program : (varDef | funcDef)* EOF;
 
 basicType : INT;
 retType : basicType | VOID;
@@ -22,11 +22,11 @@ varDef : constPrefix type=basicType varDefEntry (COMMA varDefEntry)* SEMICOLON;
 funcParam : type=basicType name=IDENT (incompleteArray arrayPostfix)?;
 funcDef : r_type=retType name=IDENT L_PAREN (funcParam (COMMA funcParam)*)? R_PAREN stmtBlock;
 
-leftVal : IDENT arrayPostfix;
+varAccess : IDENT arrayPostfix;
 funcRealParam : expr;
 expr : value=INTEGER_CONST # const
      | func=IDENT L_PAREN (funcRealParam (COMMA funcRealParam)*)? R_PAREN # functionCall
-     | leftVal # access
+     | varAccess # access
      | L_PAREN expr R_PAREN # paren
      | op=(PLUS | MINUS | NOT) x=expr # unary
      | l=expr op=(MUL | DIV | MOD) r=expr # muls
@@ -40,7 +40,7 @@ conds : expr # exprCond
 
 stmtBlock : L_BRACE (varDef | stmt)* R_BRACE;
 stmt : expr? SEMICOLON # expression
-     | lvalue=leftVal ASSIGN value=expr SEMICOLON # assignment
+     | lvalue=varAccess ASSIGN value=expr SEMICOLON # assignment
      | stmtBlock # block
      | IF L_PAREN cond=conds R_PAREN stmtTrue=stmt (ELSE stmtFalse=stmt)? # if
      | WHILE L_PAREN cond=conds R_PAREN stmtTrue=stmt # while

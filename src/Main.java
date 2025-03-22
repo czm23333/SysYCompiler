@@ -7,10 +7,10 @@ public class Main {
         if (args.length == 0) System.exit(1);
         var flag = new boolean[1];
         var parser = getSysYParser(CharStreams.fromFileName(args[0]), flag);
-        var formatter = new SysYFormatVisitor();
+        var checker = new SysYSemanticsChecker();
         var program = parser.program();
         if (flag[0]) return;
-        System.out.print(formatter.visit(program).trim());
+        program.accept(checker);
     }
 
     private static SysYParser getSysYParser(CharStream stream, boolean[] flag) {
