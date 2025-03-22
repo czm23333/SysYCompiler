@@ -23,7 +23,7 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
     }
 
     private static void reportError(int line, SemanticError error) {
-        System.err.printf("Error type %d at Line %d: %s", error.id, line, error.message);
+        System.err.printf("Error type %d at Line %d: %s\n", error.id, line, error.message);
     }
 
     @Override
