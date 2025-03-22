@@ -1,6 +1,6 @@
 import java.util.Objects;
 
-public abstract class AbstractArrayType implements Type {
+public abstract class AbstractArrayType extends DummyType {
     public final Type elementType;
 
     public AbstractArrayType(Type elementType) {
@@ -9,6 +9,7 @@ public abstract class AbstractArrayType implements Type {
 
     @Override
     public boolean convertibleTo(Type other) {
+        if (super.convertibleTo(other)) return true;
         if (other instanceof AbstractArrayType) return elementType.convertibleTo(((AbstractArrayType) other).elementType);
         return false;
     }

@@ -1,3 +1,5 @@
 public interface Type {
-    boolean convertibleTo(Type other);
+    default boolean convertibleTo(Type other) {
+        return other instanceof ErroneousType || equals(other);
+    }
 }

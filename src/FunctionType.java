@@ -1,7 +1,7 @@
 import java.util.List;
 import java.util.Objects;
 
-public class FunctionType implements Type {
+public class FunctionType extends DummyType {
     public final Type returnType;
     public final List<Type> parameters;
 
@@ -12,6 +12,7 @@ public class FunctionType implements Type {
 
     @Override
     public boolean convertibleTo(Type other) {
+        if (super.convertibleTo(other)) return true;
         if (other instanceof FunctionType) {
             var functionType = (FunctionType) other;
 
