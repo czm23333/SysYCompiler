@@ -1,6 +1,4 @@
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
@@ -64,21 +62,22 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
             return defaultResult();
         }
 
-        currentFunctionType = new FunctionType(TypeUtil.typeFromRetType(ctx.retType()),
-                ctx.funcParam().stream().map(TypeUtil::typeFromFuncParam).collect(Collectors.toList()));
-        context.define(name, new ValueWithType(ValueType.RIGHT, currentFunctionType));
+        var newContext = new Context(context);
+        pushContext(newContext);
 
-        context = new Context(context);
-        pushContext(context);
-
+        List<Type> paramTypes = new ArrayList<>();
         for (var param : ctx.funcParam()) {
             var paramName = param.name.getText();
-            if (context.containsLocal(paramName)) {
+            if (newContext.containsLocal(paramName)) {
                 reportError(param.name.getLine(), SemanticError.VARIABLE_REDECLARATION);
                 continue;
             }
-            context.define(paramName, new ValueWithType(ValueType.LEFT, TypeUtil.typeFromFuncParam(param)));
+            var paramType = TypeUtil.typeFromFuncParam(param);
+            newContext.define(paramName, new ValueWithType(ValueType.LEFT, paramType));
+            paramTypes.add(paramType);
         }
+        currentFunctionType = new FunctionType(TypeUtil.typeFromRetType(ctx.retType()), paramTypes);
+        context.define(name, new ValueWithType(ValueType.RIGHT, currentFunctionType));
 
         var result = super.visitFuncDef(ctx);
         popContext();
@@ -140,8 +139,7 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
         if (functionType.parameters.size() != realParams.size()) {
             reportError(ctx.start.getLine(), SemanticError.FUNCTION_PARAM_MISMATCH);
             flag = true;
-        }
-        else {
+        } else {
             for (int i = 0; i < realParams.size(); ++i)
                 if (!realParams.get(i)
                         .convertibleTo(new ValueWithType(ValueType.RIGHT, functionType.parameters.get(i)))) {
