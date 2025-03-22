@@ -3,6 +3,8 @@ public enum BasicType implements Type {
 
     @Override
     public boolean convertibleTo(Type other) {
-        return equals(other);
+        if (equals(other)) return true;
+        if (this == INT && other == BOOL) return true;
+        return this == BOOL && other == INT;
     }
 }
