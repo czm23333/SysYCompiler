@@ -11,6 +11,7 @@ public class Main {
         var program = parser.program();
         if (flag[0]) return;
         program.accept(checker);
+        if (!checker.hasError) System.err.println("No semantic errors in the program!");
     }
 
     private static SysYParser getSysYParser(CharStream stream, boolean[] flag) {

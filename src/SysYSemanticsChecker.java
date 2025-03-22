@@ -8,6 +8,7 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
     public static final ValueWithType RIGHT_INT = new ValueWithType(ValueType.RIGHT, BasicType.INT);
     public static final ValueWithType RIGHT_VOID = new ValueWithType(ValueType.RIGHT, VoidType.VOID);
     public static final ValueWithType LEFT_ERROR = new ValueWithType(ValueType.LEFT, ErroneousType.ERROR);
+    public boolean hasError = false;
     private final Deque<Context> contextStack = new ArrayDeque<>();
     private FunctionType currentFunctionType = null;
 
@@ -23,7 +24,8 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
         contextStack.addLast(context);
     }
 
-    private static void reportError(int line, SemanticError error) {
+    private void reportError(int line, SemanticError error) {
+        hasError = true;
         System.err.printf("Error type %d at Line %d: %s\n", error.id, line, error.message);
     }
 
