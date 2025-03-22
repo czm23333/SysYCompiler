@@ -88,7 +88,7 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
     @Override
     public ValueWithType visitArrayPostfixSingle(SysYParser.ArrayPostfixSingleContext ctx) {
         var index = visit(ctx.expr());
-        if (!index.convertibleTo(new ValueWithType(ValueType.RIGHT, BasicType.INT)))
+        if (!index.convertibleTo(RIGHT_INT))
             reportError(ctx.expr().start.getLine(), SemanticError.OPERATOR_TYPE_MISMATCH);
         return defaultResult();
     }
