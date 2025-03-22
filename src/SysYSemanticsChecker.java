@@ -7,6 +7,7 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
     public static final ValueWithType RIGHT_BOOL = new ValueWithType(ValueType.RIGHT, BasicType.BOOL);
     public static final ValueWithType RIGHT_INT = new ValueWithType(ValueType.RIGHT, BasicType.INT);
     public static final ValueWithType RIGHT_VOID = new ValueWithType(ValueType.RIGHT, VoidType.VOID);
+    public static final ValueWithType LEFT_ERROR = new ValueWithType(ValueType.LEFT, ErroneousType.ERROR);
     private final Deque<Context> contextStack = new ArrayDeque<>();
     private FunctionType currentFunctionType = null;
 
@@ -97,7 +98,7 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
         var context = currentContext();
         if (!context.contains(variableName)) {
             reportError(ctx.IDENT().getSymbol().getLine(), SemanticError.UNDEFINED_VARIABLE);
-            return defaultResult();
+            return LEFT_ERROR;
         }
 
         var variable = context.lookup(variableName);
@@ -107,7 +108,7 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
             if (type instanceof AbstractArrayType) type = ((AbstractArrayType) type).elementType;
             else {
                 reportError(single.start.getLine(), SemanticError.ILLEGAL_INDEXING);
-                return defaultResult();
+                return LEFT_ERROR;
             }
         }
 
@@ -120,13 +121,13 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
         var context = currentContext();
         if (!context.contains(functionName)) {
             reportError(ctx.func.getLine(), SemanticError.UNDEFINED_FUNCTION);
-            return defaultResult();
+            return LEFT_ERROR;
         }
 
         var function = context.lookup(functionName);
         if (!(function.valueType.convertibleTo(ValueType.RIGHT) && function.type instanceof FunctionType)) {
             reportError(ctx.func.getLine(), SemanticError.ILLEGAL_FUNCTION_CALL);
-            return defaultResult();
+            return LEFT_ERROR;
         }
 
         var functionType = (FunctionType) function.type;
@@ -144,7 +145,7 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
 
         if (mismatch != -1) {
             reportError(mismatch, SemanticError.FUNCTION_PARAM_MISMATCH);
-            return defaultResult();
+            return LEFT_ERROR;
         }
 
         return new ValueWithType(ValueType.RIGHT, functionType.returnType);
@@ -162,13 +163,13 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
         if ("!".equals(operator)) {
             if (!operand.convertibleTo(RIGHT_BOOL)) {
                 reportError(ctx.expr().start.getLine(), SemanticError.OPERATOR_TYPE_MISMATCH);
-                return defaultResult();
+                return LEFT_ERROR;
             }
             return RIGHT_BOOL;
         } else {
             if (!operand.convertibleTo(RIGHT_INT)) {
                 reportError(ctx.expr().start.getLine(), SemanticError.OPERATOR_TYPE_MISMATCH);
-                return defaultResult();
+                return LEFT_ERROR;
             }
             return RIGHT_INT;
         }
@@ -180,11 +181,11 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
         var right = visit(ctx.r);
         if (!left.convertibleTo(RIGHT_INT)) {
             reportError(ctx.l.start.getLine(), SemanticError.OPERATOR_TYPE_MISMATCH);
-            return defaultResult();
+            return LEFT_ERROR;
         }
         if (!right.convertibleTo(RIGHT_INT)) {
             reportError(ctx.r.start.getLine(), SemanticError.OPERATOR_TYPE_MISMATCH);
-            return defaultResult();
+            return LEFT_ERROR;
         }
         return RIGHT_INT;
     }
@@ -195,11 +196,11 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
         var right = visit(ctx.r);
         if (!left.convertibleTo(RIGHT_INT)) {
             reportError(ctx.l.start.getLine(), SemanticError.OPERATOR_TYPE_MISMATCH);
-            return defaultResult();
+            return LEFT_ERROR;
         }
         if (!right.convertibleTo(RIGHT_INT)) {
             reportError(ctx.r.start.getLine(), SemanticError.OPERATOR_TYPE_MISMATCH);
-            return defaultResult();
+            return LEFT_ERROR;
         }
         return RIGHT_INT;
     }
@@ -210,11 +211,11 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
         var right = visit(ctx.r);
         if (!left.convertibleTo(RIGHT_BOOL)) {
             reportError(ctx.l.start.getLine(), SemanticError.OPERATOR_TYPE_MISMATCH);
-            return defaultResult();
+            return LEFT_ERROR;
         }
         if (!right.convertibleTo(RIGHT_BOOL)) {
             reportError(ctx.r.start.getLine(), SemanticError.OPERATOR_TYPE_MISMATCH);
-            return defaultResult();
+            return LEFT_ERROR;
         }
         return RIGHT_BOOL;
     }
@@ -225,11 +226,11 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
         var right = visit(ctx.r);
         if (!left.convertibleTo(RIGHT_INT)) {
             reportError(ctx.l.start.getLine(), SemanticError.OPERATOR_TYPE_MISMATCH);
-            return defaultResult();
+            return LEFT_ERROR;
         }
         if (!right.convertibleTo(RIGHT_INT)) {
             reportError(ctx.r.start.getLine(), SemanticError.OPERATOR_TYPE_MISMATCH);
-            return defaultResult();
+            return LEFT_ERROR;
         }
         return RIGHT_INT;
     }
@@ -240,11 +241,11 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
         var right = visit(ctx.r);
         if (!left.convertibleTo(RIGHT_BOOL)) {
             reportError(ctx.l.start.getLine(), SemanticError.OPERATOR_TYPE_MISMATCH);
-            return defaultResult();
+            return LEFT_ERROR;
         }
         if (!right.convertibleTo(RIGHT_BOOL)) {
             reportError(ctx.r.start.getLine(), SemanticError.OPERATOR_TYPE_MISMATCH);
-            return defaultResult();
+            return LEFT_ERROR;
         }
         return RIGHT_BOOL;
     }
@@ -255,11 +256,11 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
         var right = visit(ctx.r);
         if (!left.convertibleTo(RIGHT_INT)) {
             reportError(ctx.l.start.getLine(), SemanticError.OPERATOR_TYPE_MISMATCH);
-            return defaultResult();
+            return LEFT_ERROR;
         }
         if (!right.convertibleTo(RIGHT_INT)) {
             reportError(ctx.r.start.getLine(), SemanticError.OPERATOR_TYPE_MISMATCH);
-            return defaultResult();
+            return LEFT_ERROR;
         }
         return RIGHT_INT;
     }
@@ -278,12 +279,12 @@ public class SysYSemanticsChecker extends SysYParserBaseVisitor<ValueWithType> {
         var right = visit(ctx.value);
         if (!left.valueType.convertibleTo(ValueType.LEFT)) {
             reportError(ctx.lvalue.start.getLine(), SemanticError.ILLEGAL_ASSIGN);
-            return defaultResult();
+            return LEFT_ERROR;
         }
 
         if (!right.convertibleTo(new ValueWithType(ValueType.RIGHT, left.type))) {
             reportError(ctx.value.start.getLine(), SemanticError.ASSIGN_TYPE_MISMATCH);
-            return defaultResult();
+            return LEFT_ERROR;
         }
 
         return left;
