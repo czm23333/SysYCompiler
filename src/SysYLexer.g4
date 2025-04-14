@@ -81,6 +81,6 @@ INTEGER_CONST : DECIMAL_INTEGER | OCTAL_INTEGER | HEX_INTEGER;
 
 WS : [ \r\n\t]+ -> skip;
 
-LINE_COMMENT : (('//' .*? '\n') | ('//' .*? EOF)) -> skip;
+LINE_COMMENT : '//' .*? ('\n' | EOF) -> skip;
 
 MULTILINE_COMMENT : '/*' .*? '*/' -> skip;
