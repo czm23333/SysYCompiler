@@ -1,17 +1,21 @@
 import org.antlr.v4.runtime.*;
 
+import java.io.File;
 import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        if (args.length == 0) System.exit(1);
+        if (args.length != 2) System.exit(1);
         var flag = new boolean[1];
         var parser = getSysYParser(CharStreams.fromFileName(args[0]), flag);
         var checker = new SysYSemanticsChecker();
         var program = parser.program();
         if (flag[0]) return;
         program.accept(checker);
-        if (!checker.hasError) System.err.println("No semantic errors in the program!");
+        if (checker.hasError) return;
+
+        var translator = new SysYTranslator(new File(args[1]));
+        program.accept(translator);
     }
 
     private static SysYParser getSysYParser(CharStream stream, boolean[] flag) {
