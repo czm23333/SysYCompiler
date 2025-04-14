@@ -223,16 +223,15 @@ public class SysYTranslator extends SysYParserBaseVisitor<Value> {
 
     @Override
     public Value visitMuls(SysYParser.MulsContext ctx) {
-        var l = visit(ctx.l);
-        var r = visit(ctx.r);
+        var l = castHelper.elevate(visit(ctx.l));
+        var r = castHelper.elevate(visit(ctx.r));
         switch (ctx.op.getType()) {
             case SysYLexer.MUL:
-                return irBuilder.buildIntMul(castHelper.elevate(l), castHelper.elevate(r), WrapSemantics.Unspecified,
-                        Option.of("Mul"));
+                return irBuilder.buildIntMul(l, r, WrapSemantics.Unspecified, Option.of("Mul"));
             case SysYLexer.DIV:
-                return irBuilder.buildSignedDiv(castHelper.elevate(l), castHelper.elevate(r), false, Option.of("Div"));
+                return irBuilder.buildSignedDiv(l, r, false, Option.of("Div"));
             case SysYLexer.MOD:
-                return irBuilder.buildSignedRem(castHelper.elevate(l), castHelper.elevate(r), Option.of("Mod"));
+                return irBuilder.buildSignedRem(l, r, Option.of("Mod"));
             default:
                 throw new IllegalArgumentException("Unsupported operator: " + ctx.op.getText());
         }
@@ -240,15 +239,13 @@ public class SysYTranslator extends SysYParserBaseVisitor<Value> {
 
     @Override
     public Value visitAdds(SysYParser.AddsContext ctx) {
-        var l = visit(ctx.l);
-        var r = visit(ctx.r);
+        var l = castHelper.elevate(visit(ctx.l));
+        var r = castHelper.elevate(visit(ctx.r));
         switch (ctx.op.getType()) {
             case SysYLexer.PLUS:
-                return irBuilder.buildIntAdd(castHelper.elevate(l), castHelper.elevate(r), WrapSemantics.Unspecified,
-                        Option.of("Add"));
+                return irBuilder.buildIntAdd(l, r, WrapSemantics.Unspecified, Option.of("Add"));
             case SysYLexer.MINUS:
-                return irBuilder.buildIntSub(castHelper.elevate(l), castHelper.elevate(r), WrapSemantics.Unspecified,
-                        Option.of("Sub"));
+                return irBuilder.buildIntSub(l, r, WrapSemantics.Unspecified, Option.of("Sub"));
             default:
                 throw new IllegalArgumentException("Unsupported operator: " + ctx.op.getText());
         }
@@ -256,7 +253,7 @@ public class SysYTranslator extends SysYParserBaseVisitor<Value> {
 
     @SuppressWarnings("unchecked")
     private Value buildShortcut(SysYParser.ExprContext lExp, SysYParser.ExprContext rExp, boolean shortcutOn) {
-        var l = visit(lExp);
+        var l = castHelper.convertTo(visit(lExp), BOOL_TYPE);
         var oldBlock = currentBlock;
         var rightBlock = context.newBasicBlock("RightPath");
         var mergeBlock = context.newBasicBlock("Merge");
@@ -265,7 +262,7 @@ public class SysYTranslator extends SysYParserBaseVisitor<Value> {
         if (shortcutOn) irBuilder.buildConditionalBranch(l, mergeBlock, rightBlock);
         else irBuilder.buildConditionalBranch(l, rightBlock, mergeBlock);
         switchBlock(rightBlock);
-        var r = visit(rExp);
+        var r = castHelper.convertTo(visit(rExp), BOOL_TYPE);
         rightBlock = currentBlock;
         irBuilder.buildBranch(mergeBlock);
         switchBlock(mergeBlock);
@@ -286,15 +283,13 @@ public class SysYTranslator extends SysYParserBaseVisitor<Value> {
 
     @Override
     public Value visitEqs(SysYParser.EqsContext ctx) {
-        var l = visit(ctx.l);
-        var r = visit(ctx.r);
+        var l = castHelper.elevate(visit(ctx.l));
+        var r = castHelper.elevate(visit(ctx.r));
         switch (ctx.op.getType()) {
             case SysYLexer.EQ:
-                return irBuilder.buildIntCompare(IntPredicate.Equal, castHelper.elevate(l), castHelper.elevate(r),
-                        Option.of("Eq"));
+                return irBuilder.buildIntCompare(IntPredicate.Equal, l, r, Option.of("Eq"));
             case SysYLexer.NEQ:
-                return irBuilder.buildIntCompare(IntPredicate.NotEqual, castHelper.elevate(l), castHelper.elevate(r),
-                        Option.of("Neq"));
+                return irBuilder.buildIntCompare(IntPredicate.NotEqual, l, r, Option.of("Neq"));
             default:
                 throw new IllegalArgumentException("Unsupported operator: " + ctx.op.getText());
         }
@@ -302,21 +297,17 @@ public class SysYTranslator extends SysYParserBaseVisitor<Value> {
 
     @Override
     public Value visitRels(SysYParser.RelsContext ctx) {
-        var l = visit(ctx.l);
-        var r = visit(ctx.r);
+        var l = castHelper.elevate(visit(ctx.l));
+        var r = castHelper.elevate(visit(ctx.r));
         switch (ctx.op.getType()) {
             case SysYLexer.LT:
-                return irBuilder.buildIntCompare(IntPredicate.SignedLessThan, castHelper.elevate(l),
-                        castHelper.elevate(r), Option.of("LT"));
+                return irBuilder.buildIntCompare(IntPredicate.SignedLessThan, l, r, Option.of("LT"));
             case SysYLexer.GT:
-                return irBuilder.buildIntCompare(IntPredicate.SignedGreaterThan, castHelper.elevate(l),
-                        castHelper.elevate(r), Option.of("GT"));
+                return irBuilder.buildIntCompare(IntPredicate.SignedGreaterThan, l, r, Option.of("GT"));
             case SysYLexer.LE:
-                return irBuilder.buildIntCompare(IntPredicate.SignedLessEqual, castHelper.elevate(l),
-                        castHelper.elevate(r), Option.of("LE"));
+                return irBuilder.buildIntCompare(IntPredicate.SignedLessEqual, l, r, Option.of("LE"));
             case SysYLexer.GE:
-                return irBuilder.buildIntCompare(IntPredicate.SignedGreaterEqual, castHelper.elevate(l),
-                        castHelper.elevate(r), Option.of("GE"));
+                return irBuilder.buildIntCompare(IntPredicate.SignedGreaterEqual, l, r, Option.of("GE"));
             default:
                 throw new IllegalArgumentException("Unsupported operator: " + ctx.op.getText());
         }
@@ -324,12 +315,16 @@ public class SysYTranslator extends SysYParserBaseVisitor<Value> {
 
     @Override
     public Value visitAssignment(SysYParser.AssignmentContext ctx) {
-        return irBuilder.buildStore(visit(ctx.lvalue), visit(ctx.value));
+        var ptr = visit(ctx.lvalue);
+        var value = visit(ctx.value);
+        var ptrType = typeHelper.ensurePointerType(ptr.getType()).getElementType();
+        if (!typeHelper.convertibleTo(value.getType(), ptrType)) throw new IllegalArgumentException("Type mismatch");
+        return irBuilder.buildStore(ptr, castHelper.convertTo(value, ptrType));
     }
 
     @Override
     public Value visitIf(SysYParser.IfContext ctx) {
-        var cond = visit(ctx.cond);
+        var cond = castHelper.convertTo(visit(ctx.cond), BOOL_TYPE);
         var oldBlock = currentBlock;
         var trueBlock = context.newBasicBlock("IfTrue");
         var mergeBlock = context.newBasicBlock("IfMerge");
@@ -360,7 +355,7 @@ public class SysYTranslator extends SysYParserBaseVisitor<Value> {
         currentFunction.addBasicBlock(condBlock);
         irBuilder.buildBranch(condBlock);
         switchBlock(condBlock);
-        var cond = visit(ctx.cond);
+        var cond = castHelper.convertTo(visit(ctx.cond), BOOL_TYPE);
         var loopBlock = context.newBasicBlock("WhileLoop");
         var mergeBlock = context.newBasicBlock("WhileMerge");
         currentFunction.addBasicBlock(loopBlock);
@@ -448,8 +443,7 @@ public class SysYTranslator extends SysYParserBaseVisitor<Value> {
             var vWidth = vType.getTypeWidth();
             var tWidth = type.getTypeWidth();
             if (vWidth == tWidth) return value;
-            if (typeHelper.sameType(vType, BOOL_TYPE))
-                return irBuilder.buildZeroExt(value, type, Option.of("BoolExt"));
+            if (typeHelper.sameType(vType, BOOL_TYPE)) return irBuilder.buildZeroExt(value, type, Option.of("BoolExt"));
             if (vWidth < tWidth) return irBuilder.buildSignExt(value, type, Option.of("IntExt"));
             if (typeHelper.sameType(type, BOOL_TYPE))
                 return irBuilder.buildIntCompare(IntPredicate.NotEqual, value, vType.getConstant(0, false),
