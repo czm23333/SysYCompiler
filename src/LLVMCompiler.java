@@ -323,6 +323,7 @@ public class LLVMCompiler {
             int maxEnd = -1;
             for (int i = 0; i < registers.length; ++i) {
                 int otherEnd = liveRange.get(registers[i]);
+                if (otherEnd == Integer.MAX_VALUE) continue;
                 if (otherEnd > maxEnd) {
                     reg = i;
                     maxEnd = otherEnd;
