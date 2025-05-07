@@ -3,18 +3,15 @@ import org.llvm4j.llvm4j.*;
 import org.llvm4j.llvm4j.Module;
 import org.llvm4j.optional.Option;
 
-import java.io.File;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class SysYTranslator extends SysYParserBaseVisitor<Value> {
-    private final File outputFile;
-
     private final Context context = new Context();
     private final IRBuilder irBuilder = context.newIRBuilder();
-    private final Module module = context.newModule("module");
+    public final Module module = context.newModule("module");
     private final IntegerType INT_TYPE = context.getInt32Type();
     private final ConstantInt ZERO = INT_TYPE.getConstant(0, false);
     private final IntegerType BOOL_TYPE = context.getInt1Type();
@@ -37,10 +34,6 @@ public class SysYTranslator extends SysYParserBaseVisitor<Value> {
 
     private BasicBlock currentCondBlock;
     private BasicBlock currentMergeBlock;
-
-    public SysYTranslator(File outputFile) {
-        this.outputFile = outputFile;
-    }
 
     private Value lookupSymbol(String name) {
         Value res = null;
@@ -80,9 +73,7 @@ public class SysYTranslator extends SysYParserBaseVisitor<Value> {
 
     @Override
     public Value visitProgram(SysYParser.ProgramContext ctx) {
-        var res = super.visitProgram(ctx);
-        module.dump(Option.of(outputFile));
-        return res;
+        return super.visitProgram(ctx);
     }
 
     @Override

@@ -1,4 +1,5 @@
 import org.antlr.v4.runtime.*;
+import org.llvm4j.optional.Option;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,8 +15,10 @@ public class Main {
         program.accept(checker);
         if (checker.hasError) return;
 
-        var translator = new SysYTranslator(new File(args[1]));
+        var translator = new SysYTranslator();
         program.accept(translator);
+        var compiler = new LLVMCompiler(translator.module, new File(args[1]));
+        compiler.compile();
     }
 
     private static SysYParser getSysYParser(CharStream stream, boolean[] flag) {
