@@ -189,7 +189,8 @@ public class LLVMCompiler {
                             LLVM.LLVMGetBasicBlockName(LLVM.LLVMGetSuccessor(inst, 1)).getString()));
                     allocator.freeTemporaries();
                 }
-                builder.append(String.format("j %s\n", LLVM.LLVMGetBasicBlockName(LLVM.LLVMGetSuccessor(inst, 0)).getString()));
+                builder.append(String.format("j %s\n",
+                        LLVM.LLVMGetBasicBlockName(LLVM.LLVMGetSuccessor(inst, 0)).getString()));
                 break;
             default:
                 throw new IllegalArgumentException("Unknown opcode: " + opcode);
