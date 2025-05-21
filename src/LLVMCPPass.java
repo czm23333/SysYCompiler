@@ -180,7 +180,7 @@ public class LLVMCPPass extends LLVMPass {
                 if (LLVM.LLVMIsAConstantInt(cond) == null) continue;
                 var condConst = Math.toIntExact(LLVM.LLVMConstIntGetSExtValue(cond)) == 0 ? 1 : 0;
                 var constSucc = LLVM.LLVMGetSuccessor(exitInst, condConst);
-                LLVM.LLVMInstructionRemoveFromParent(exitInst);
+                LLVM.LLVMInstructionEraseFromParent(exitInst);
 
                 LLVM.LLVMPositionBuilderAtEnd(builder, bb);
                 LLVM.LLVMBuildBr(builder, constSucc);
