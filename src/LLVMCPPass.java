@@ -29,6 +29,10 @@ public class LLVMCPPass extends LLVMPass {
     protected void prepare() {
         super.prepare();
         calculateInst();
+        instSuccessors.clear();
+        instPredecessors.clear();
+        allInstructions.forEach(inst -> instSuccessors.put(inst, new HashSet<>()));
+        allInstructions.forEach(inst -> instPredecessors.put(inst, new HashSet<>()));
         calculateBB();
 
         var ref = module.getRef();
@@ -104,6 +108,26 @@ public class LLVMCPPass extends LLVMPass {
         return newOut;
     }
 
+    private boolean updateSuccessors(DataFacts in, LLVMValueRef inst) {
+        var newSucc = new HashSet<LLVMValueRef>();
+        if (LLVM.LLVMGetInstructionOpcode(inst) == LLVM.LLVMBr) {
+            if (LLVM.LLVMIsConditional(inst) != 0) {
+                var cond = valueToCPValue(LLVM.LLVMGetCondition(inst), in);
+                if (cond instanceof Constant) newSucc.add(LLVM.LLVMGetFirstInstruction(
+                        LLVM.LLVMGetSuccessor(inst, ((Constant) cond).value == 0 ? 1 : 0)));
+                else if (cond instanceof NonConstant) {
+                    newSucc.add(LLVM.LLVMGetFirstInstruction(LLVM.LLVMGetSuccessor(inst, 0)));
+                    newSucc.add(LLVM.LLVMGetFirstInstruction(LLVM.LLVMGetSuccessor(inst, 1)));
+                }
+            } else newSucc.add(LLVM.LLVMGetFirstInstruction(LLVM.LLVMGetSuccessor(inst, 0)));
+        } else {
+            var next = LLVM.LLVMGetNextInstruction(inst);
+            if (next != null) newSucc.add(next);
+        }
+
+        return newSucc.stream().map(next -> addInstFlow(inst, next)).reduce(Boolean::logicalOr).orElse(false);
+    }
+
     private void solveCP() {
         prepare();
 
@@ -119,8 +143,9 @@ public class LLVMCPPass extends LLVMPass {
                 ins.put(inst, newIn);
             }
 
-            var newOut = transfer(ins.get(inst), inst);
-            if (newOut.equals(outs.get(inst))) continue;
+            var factsIn = ins.get(inst);
+            var newOut = transfer(factsIn, inst);
+            if (!updateSuccessors(factsIn, inst) && newOut.equals(outs.get(inst))) continue;
             outs.put(inst, newOut);
             worklist.addAll(instSuccessors.get(inst));
         }

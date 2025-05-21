@@ -23,6 +23,22 @@ public abstract class LLVMPass {
         this.module = module;
     }
 
+    protected boolean addInstFlow(LLVMValueRef from, LLVMValueRef to) {
+        var successors = instSuccessors.get(from);
+        if (successors.contains(to)) return false;
+        successors.add(to);
+        instPredecessors.get(to).add(from);
+        return true;
+    }
+
+    protected boolean addBBFlow(LLVMBasicBlockRef from, LLVMBasicBlockRef to) {
+        var successors = bbSuccessors.get(from);
+        if (successors.contains(to)) return false;
+        successors.add(to);
+        bbPredecessors.get(to).add(from);
+        return true;
+    }
+
     protected void calculateBB() {
         allBasicBlocks.clear();
         bbPredecessors.clear();
