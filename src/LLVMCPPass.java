@@ -153,6 +153,17 @@ public class LLVMCPPass extends LLVMPass {
 
     private boolean replaceConstant() {
         boolean flag = false;
+        for (var iter = allInstructions.iterator(); iter.hasNext(); ) {
+            var inst = iter.next();
+            var out = outs.get(inst);
+            var cur = out.get(inst);
+            if (cur instanceof Constant) {
+                LLVM.LLVMReplaceAllUsesWith(inst, LLVM.LLVMConstInt(LLVM.LLVMTypeOf(inst), ((Constant) cur).value, 1));
+                iter.remove();
+                LLVM.LLVMInstructionEraseFromParent(inst);
+                flag = true;
+            }
+        }
         for (var inst : allInstructions) {
             var in = ins.get(inst);
             var operandCnt = LLVM.LLVMGetNumOperands(inst);
