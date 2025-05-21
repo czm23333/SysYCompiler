@@ -17,8 +17,9 @@ public class Main {
 
         var translator = new SysYTranslator();
         program.accept(translator);
-        var compiler = new LLVMCompiler(translator.module, new File(args[1]));
-        compiler.compile();
+        var module = translator.module;
+        new LLVMPassManager(module).run();
+        module.dump(Option.of(new File(args[1])));
     }
 
     private static SysYParser getSysYParser(CharStream stream, boolean[] flag) {
