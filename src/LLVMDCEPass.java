@@ -48,6 +48,7 @@ public class LLVMDCEPass extends LLVMPass {
             var succs = bbSuccessors.get(bb);
             if (succs.size() != 1) continue;
             var succ = succs.iterator().next();
+            if (bb.equals(succ)) continue;
             var preds = bbPredecessors.get(succ);
             if (preds.size() != 1) continue;
 
