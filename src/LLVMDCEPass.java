@@ -72,6 +72,7 @@ public class LLVMDCEPass extends LLVMPass {
             var br = LLVM.LLVMGetFirstInstruction(bb);
             if (LLVM.LLVMGetInstructionOpcode(br) == LLVM.LLVMBr && LLVM.LLVMIsConditional(br) == 0) {
                 var succ = LLVM.LLVMGetSuccessor(br, 0);
+                if (bb.equals(succ)) continue;
                 LLVM.LLVMReplaceAllUsesWith(LLVM.LLVMBasicBlockAsValue(bb), LLVM.LLVMBasicBlockAsValue(succ));
                 LLVM.LLVMRemoveBasicBlockFromParent(bb);
                 calculateBB();
