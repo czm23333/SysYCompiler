@@ -67,12 +67,27 @@ public class LLVMDCEPass extends LLVMPass {
         return false;
     }
 
+    private boolean removeSingleJump() {
+        for (var bb : allBasicBlocks) {
+            var br = LLVM.LLVMGetFirstInstruction(bb);
+            if (LLVM.LLVMGetInstructionOpcode(br) == LLVM.LLVMBr && LLVM.LLVMIsConditional(br) == 0) {
+                var succ = LLVM.LLVMGetSuccessor(br, 0);
+                LLVM.LLVMReplaceAllUsesWith(LLVM.LLVMBasicBlockAsValue(bb), LLVM.LLVMBasicBlockAsValue(succ));
+                LLVM.LLVMRemoveBasicBlockFromParent(bb);
+                calculateBB();
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public boolean run() {
         prepare();
 
         boolean flag = removeUnreachable();
         while (blockMerge()) flag = true;
+        while (removeSingleJump()) flag = true;
 
         return flag;
     }
